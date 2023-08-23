@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Tests;
 
-public class UnitTest1
+public class ChatControllerTests
 {
     [Fact]
     public void CreateChat_ShouldReturnOkResult()
