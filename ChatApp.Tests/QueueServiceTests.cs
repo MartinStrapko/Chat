@@ -59,5 +59,28 @@ namespace ChatApp.Tests
             Assert.NotNull(result);
             Assert.Equal("Queue is full.", result.Value);
         }
+
+        [Fact]
+        public void TryEnqueue_ShouldReturnTrue_WhenQueueHasSpace()
+        {
+            _queueService.MaxCapacity = 2;
+
+            var chatSession = new ChatSession();
+            var result = _queueService.TryEnqueue(chatSession);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void TryEnqueue_ShouldReturnFalse_WhenQueueIsFull()
+        {
+            _queueService.MaxCapacity = 1;
+            _queueService.TryEnqueue(new ChatSession());
+
+            var anotherChatSession = new ChatSession();
+            var result = _queueService.TryEnqueue(anotherChatSession);
+
+            Assert.False(result);
+        }
     }
 }

@@ -4,14 +4,18 @@ using ChatApp.Models;
 public class QueueService : IQueueService
 {
     private readonly Queue<ChatSession> _queue = new();
+    public int MaxCapacity { get; set; } = 10;
 
     public bool TryEnqueue(ChatSession session)
     {
         if (session == null)
             return false;
-
-        _queue.Enqueue(session);
-        return true;
+        if (_queue.Count < MaxCapacity)
+        {
+            _queue.Enqueue(session);
+            return true;
+        }
+        return false;
     }
 
     public ChatSession? Dequeue()
