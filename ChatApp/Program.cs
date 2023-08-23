@@ -1,5 +1,8 @@
+using ChatApp.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IQueueService, QueueService>();
 
 var app = builder.Build();
 
