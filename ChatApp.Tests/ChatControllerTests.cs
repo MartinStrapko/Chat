@@ -6,7 +6,7 @@ namespace ChatApp.Tests;
 public class ChatControllerTests
 {
     [Fact]
-    public void CreateChat_ShouldReturnOkResult()
+    public void InitiateChat_ShouldReturnOkResult()
     {
         var controller = new ChatController();
 
