@@ -1,5 +1,8 @@
-﻿using ChatApp.Interfaces;
+﻿using ChatApp.Controllers;
+using ChatApp.Interfaces;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,5 +46,18 @@ namespace ChatApp.Tests
             Assert.False(_queueService.ContainsSession(chatSession1.SessionId));
         }
 
+        [Fact]
+        public void InitiateChat_WhenQueueIsFull_ShouldReturnBadRequest()
+        {
+            var mockQueueService = new Mock<IQueueService>();
+            mockQueueService.Setup(s => s.TryEnqueue(It.IsAny<ChatSession>())).Returns(false);
+
+            var controller = new ChatController(mockQueueService.Object);
+
+            var result = controller.InitiateChat() as BadRequestObjectResult;
+
+            Assert.NotNull(result);
+            Assert.Equal("Queue is full.", result.Value);
+        }
     }
 }
