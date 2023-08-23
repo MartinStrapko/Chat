@@ -10,8 +10,19 @@ public class ChatControllerTests
     {
         var controller = new ChatController();
 
-        var result = controller.InitiateChat();
+        var result = controller.InitiateChat() as OkObjectResult;
 
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public void InitiateChat_ShouldReturnSessionId()
+    {
+        var controller = new ChatController();
+
+        var result = controller.InitiateChat() as OkObjectResult;
+
+        Assert.NotNull(result);
+        Assert.IsType<Guid>(result.Value);
     }
 }

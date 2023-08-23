@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ChatApp.Models;
 
 namespace ChatApp.Controllers
 {
@@ -9,7 +10,12 @@ namespace ChatApp.Controllers
         [HttpPost("create-session")]
         public IActionResult InitiateChat()
         {
-            return Ok();
+            var session = new ChatSession
+            {
+                SessionId = Guid.NewGuid(),
+            };
+
+            return Ok(session.SessionId);
         }
     }
 }
