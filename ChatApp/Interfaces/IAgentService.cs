@@ -6,5 +6,6 @@ namespace ChatApp.Interfaces
     {
         Agent? AssignChatToAgent(ChatSession chatSession);
         bool EndChat(Guid agentId);
+        void AddAgent(Agent agent);
     }
 }

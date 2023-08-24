@@ -14,9 +14,10 @@ public class ChatControllerTests
     public ChatControllerTests()
     {
         _mockQueueService = new Mock<IQueueService>();
+        var mockAgentService = new Mock<IAgentService>();
         _mockQueueService.Setup(service => service.TryEnqueue(It.IsAny<ChatSession>())).Returns(true);
 
-        _controller = new ChatController(_mockQueueService.Object);
+        _controller = new ChatController(_mockQueueService.Object, mockAgentService.Object);
     }
 
     [Fact]

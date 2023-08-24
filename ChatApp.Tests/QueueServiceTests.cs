@@ -35,9 +35,10 @@ namespace ChatApp.Tests
         public void InitiateChat_WhenQueueIsFull_ShouldReturnBadRequest()
         {
             var mockQueueService = new Mock<IQueueService>();
+            var mockAgentService = new Mock<IAgentService>();
             mockQueueService.Setup(s => s.TryEnqueue(It.IsAny<ChatSession>())).Returns(false);
 
-            var controller = new ChatController(mockQueueService.Object);
+            var controller = new ChatController(mockQueueService.Object, mockAgentService.Object);
 
             var result = controller.InitiateChat() as BadRequestObjectResult;
 
