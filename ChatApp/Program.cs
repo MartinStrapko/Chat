@@ -8,10 +8,10 @@ var afternoonShift = new Shift { Name = "Afternoon", Start = TimeSpan.FromHours(
 var nightShift = new Shift { Name = "Night", Start = TimeSpan.FromHours(0), End = TimeSpan.FromHours(8) };
 var allDay = new Shift { Name = "All Day", Start = TimeSpan.FromHours(0), End = TimeSpan.FromHours(8) };
 
-var teamA = new Team { Name = "Team A", Shift = morningShift };
-var teamB = new Team { Name = "Team B", Shift = afternoonShift };
-var teamC = new Team { Name = "Team C", Shift = nightShift };
-var overflowTeam = new Team { Name = "Overflow Team", Shift = allDay };
+var teamA = new Team { Name = "Team A", Shift = morningShift, Agents = new List<Agent>() };
+var teamB = new Team { Name = "Team B", Shift = afternoonShift, Agents = new List<Agent>() };
+var teamC = new Team { Name = "Team C", Shift = nightShift, Agents = new List<Agent>() };
+var overflowTeam = new Team { Name = "Overflow Team", Shift = allDay, Agents = new List<Agent>() };
 
 teamA.Agents.Add(new Agent { Name = "Team Lead 1", Seniority = ChatApp.Enums.AgentSeniority.TeamLead });
 teamA.Agents.Add(new Agent { Name = "Mid Level 1", Seniority = ChatApp.Enums.AgentSeniority.MidLevel });
