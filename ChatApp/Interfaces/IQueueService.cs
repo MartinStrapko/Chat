@@ -12,5 +12,9 @@ namespace ChatApp.Interfaces
 
         // Checks if a session is already in the queue
         bool ContainsSession(Guid sessionId);
+
+        bool PollSession(Guid sessionId);
+
+        void CheckMissedPolls();
     }
 }

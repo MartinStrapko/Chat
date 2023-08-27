@@ -40,5 +40,15 @@ namespace ChatApp.Controllers
             }
             return BadRequest("Queue is full.");
         }
+
+        [HttpPost("poll-session/{sessionId}")]
+        public IActionResult PollSession(Guid sessionId)
+        {
+            if (_queueService.PollSession(sessionId))
+            {
+                return Ok();
+            }
+            return NotFound("Session not found or already inactive.");
+        }
     }
 }

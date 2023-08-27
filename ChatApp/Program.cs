@@ -1,7 +1,9 @@
+using ChatApp;
 using ChatApp.Interfaces;
 using ChatApp.Models;
 using ChatApp.Services;
 using System.Xml.Linq;
+
 
 var morningShift = new Shift { Name = "Morning", Start = TimeSpan.FromHours(8), End = TimeSpan.FromHours(16) };
 var afternoonShift = new Shift { Name = "Afternoon", Start = TimeSpan.FromHours(16), End = TimeSpan.FromHours(24) };
@@ -40,6 +42,8 @@ var teams = new List<Team> { teamA, teamB, teamC, overflowTeam };
 var shifts = new List<Shift> { morningShift, afternoonShift, nightShift, allDay };
 builder.Services.AddSingleton(teams);
 builder.Services.AddSingleton(shifts);
+builder.Services.AddHostedService<CheckMissedPollsService>();
+builder.Services.Configure<ChatSettings>(builder.Configuration.GetSection("ChatSettings"));
 
 var app = builder.Build();
 
