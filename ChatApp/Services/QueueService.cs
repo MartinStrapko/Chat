@@ -1,7 +1,9 @@
 ﻿using ChatApp;
 using ChatApp.Interfaces;
 using ChatApp.Models;
+using ChatApp.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 
 public class QueueService : IQueueService
@@ -11,17 +13,33 @@ public class QueueService : IQueueService
     private readonly ChatSettings _chatSettings;
     private readonly int _expectedPollsInIntervalSeconds;
     private readonly int _markInactiveAfterNumberOfMissedPolls;
+    private readonly IAgentService _agentService;
 
     public int MaxCapacity { get; set; } = 10;
     public int OverflowCapacity { get; set; } = 10;
     public TimeSpan OfficeStart { get; set; } = new TimeSpan(9, 0, 0);
     public TimeSpan OfficeEnd { get; set; } = new TimeSpan(17, 0, 0);
 
-    public QueueService(IOptions<ChatSettings> mySettings)
+    public QueueService(IOptions<ChatSettings> mySettings, IAgentService agentService)
     {
         _chatSettings = mySettings.Value;
+        _agentService = agentService;
         _expectedPollsInIntervalSeconds = _chatSettings.TimerIntervalSeconds / _chatSettings.PollsPerSecond;
         _markInactiveAfterNumberOfMissedPolls = _chatSettings.MarkInactiveAfterNumberOfMissedPolls;
+    }
+
+    public bool IsQueueFull()
+    {
+        var teamOnShift = _agentService.GetTeamOnShift();
+        var maxQueueLength = teamOnShift.MaxQueueLength;
+
+        return _queue.Count >= maxQueueLength;
+    }
+
+    private void AssignAgent()
+    {
+        ChatSession? sessionToAssign = _queue.Dequeue();
+        _agentService.AssignChatToAgent(sessionToAssign);
     }
 
     public bool TryEnqueue(ChatSession session)
@@ -31,14 +49,18 @@ public class QueueService : IQueueService
         if (_queue.Count < MaxCapacity)
         {
             _queue.Enqueue(session);
-            return true;
         }
         else if (IsOfficeHours() && _overflowQueue.Count < OverflowCapacity)
         {
             _overflowQueue.Enqueue(session);
-            return true;
         }
-        return false;
+        else
+        {
+            return false;
+        }
+
+        AssignAgent();
+        return true;
     }
 
     public ChatSession? Dequeue()
@@ -78,6 +100,26 @@ public class QueueService : IQueueService
             }
             session.PollsSiceLastCheck = 0;
 
+        }
+    }
+
+    private void AssignWaitingChats()
+    {
+        while (true)
+        {
+            var agent = _agentService.GetAvailableAgent();
+            if (agent == null)
+                break;
+            var session = Dequeue();
+
+            if (session != null)
+            {
+                _agentService.AssignChatToAgent(session);
+            }
+            else
+            {
+                break;
+            }
         }
     }
 

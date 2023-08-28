@@ -4,7 +4,9 @@ namespace ChatApp.Interfaces
 {
     public interface IAgentService
     {
-        Agent? AssignChatToAgent();
+        Agent? AssignChatToAgent(ChatSession chatSession);
+        Agent? GetAvailableAgent();
         bool EndChat(Guid sessionId);
+        public Team GetTeamOnShift();
     }
 }

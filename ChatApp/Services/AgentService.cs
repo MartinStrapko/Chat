@@ -7,14 +7,13 @@ namespace ChatApp.Services
     {
         private readonly List<Team> _teams;
         private readonly List<Shift> _shifts;
-        private readonly IQueueService _queueService;
 
-        public AgentService(IQueueService queueService, List<Team> teams, List<Shift> shifts)
+        public AgentService( List<Team> teams)
         {
             _teams = teams;
-            _queueService = queueService;
         }
-        private Team GetTeamOnShift()
+
+        public Team GetTeamOnShift()
         {
             var currentTime = DateTime.UtcNow.TimeOfDay;
 
@@ -22,22 +21,11 @@ namespace ChatApp.Services
             return currentTeam;
         }
 
-        public Agent? AssignChatToAgent()
+        public Agent? AssignChatToAgent(ChatSession sessionToAssign)
         {
-            var currentTime = DateTime.UtcNow.TimeOfDay;
-
-            Team currentTeam = GetTeamOnShift();
-
             Agent? availableAgent = GetAvailableAgent();
 
             if (availableAgent == null)
-            {
-                return null;
-            }
-
-            ChatSession? sessionToAssign = _queueService.Dequeue();
-
-            if (sessionToAssign == null)
             {
                 return null;
             }
@@ -69,22 +57,10 @@ namespace ChatApp.Services
             return false;
         }
 
-        private Agent? GetAvailableAgent()
+        public Agent? GetAvailableAgent()
         {
             Team currentTeam = GetTeamOnShift();
             return currentTeam.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
-        }
-
-        private void AssignWaitingChats()
-        {
-            while (true)
-            {
-                var agent = GetAvailableAgent();
-                if (agent == null)
-                    break;
-
-                AssignChatToAgent();
-            }
         }
     }
 }

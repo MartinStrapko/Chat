@@ -28,7 +28,8 @@ namespace ChatApp.Controllers
 
             if (_queueService.TryEnqueue(session))
             {
-                var assignedAgent = _agentService.AssignChatToAgent();
+                ChatSession? sessionToAssign = _queueService.Dequeue();
+                var assignedAgent = _agentService.AssignChatToAgent(sessionToAssign);
                 if (assignedAgent != null)
                 {
                     return Ok(new { SessionId = session.SessionId, AgentId = assignedAgent.Id });

@@ -9,8 +9,26 @@ namespace ChatApp.Models
         public AgentSeniority Seniority { get; set; }
         public bool IsAvailable { get; set; } = true;
         public int CurrentChatsCount { get; set; } = 0;
-        public const int MaxConcurrentChats = 10;
-        public bool CanHandleMoreChats => CurrentChatsCount < MaxConcurrentChats;
+        public bool CanHandleMoreChats => CurrentChatsCount < Capacity;
+
+        public const int BaseConcurrency = 10;
+
+        public double EfficiencyMultiplier
+        {
+            get
+            {
+                return Seniority switch
+                {
+                    AgentSeniority.Junior => 0.4,
+                    AgentSeniority.MidLevel => 0.6,
+                    AgentSeniority.Senior => 0.8,
+                    AgentSeniority.TeamLead => 0.5,
+                    _ => 1.0
+                };
+            }
+        }
+
+        public double Capacity => BaseConcurrency * EfficiencyMultiplier;
         public List<ChatSession> CurrentChatSessions { get; set; } = new List<ChatSession>();
         public void AssignChatSession(ChatSession session)
         {
