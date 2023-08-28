@@ -5,6 +5,6 @@ namespace ChatApp.Interfaces
     public interface IAgentService
     {
         Agent? AssignChatToAgent();
-        bool EndChat(Guid agentId);
+        bool EndChat(Guid sessionId);
     }
 }

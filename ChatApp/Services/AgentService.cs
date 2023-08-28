@@ -28,6 +28,13 @@ namespace ChatApp.Services
 
             Team currentTeam = GetTeamOnShift();
 
+            Agent? availableAgent = GetAvailableAgent();
+
+            if (availableAgent == null)
+            {
+                return null;
+            }
+
             ChatSession? sessionToAssign = _queueService.Dequeue();
 
             if (sessionToAssign == null)
@@ -35,29 +42,28 @@ namespace ChatApp.Services
                 return null;
             }
 
-            Agent? availableAgent = currentTeam.Agents.FirstOrDefault(agent => agent.IsAvailable);
+            availableAgent.CurrentChatsCount++;
 
-            if (availableAgent == null)
-            {
-                return null;
-            }
-
-            availableAgent.IsAvailable = false;
-            availableAgent.CurrentChatSession = sessionToAssign;
+            availableAgent.AssignChatSession(sessionToAssign);
 
             return availableAgent;
         }
 
-        public bool EndChat(Guid agentId)
+        public bool EndChat(Guid sessionId)
         {
-            Team currentTeam = GetTeamOnShift();
-            var agent = currentTeam.Agents.FirstOrDefault(a => a.Id == agentId);
+            var agentHandlingSession = _teams
+                .SelectMany(t => t.Agents)
+                .FirstOrDefault(a => a.CurrentChatSessions.Any(s => s.SessionId == sessionId));
 
-            if (agent != null)
+            if (agentHandlingSession != null)
             {
-                agent.IsAvailable = true;
-                agent.CurrentChatSession = null;
-                return true;
+                var sessionToBeEnded = agentHandlingSession.CurrentChatSessions.FirstOrDefault(s => s.SessionId == sessionId);
+
+                if (sessionToBeEnded != null)
+                {
+                    agentHandlingSession.RemoveChatSession(sessionToBeEnded);
+                    return true;
+                }
             }
 
             return false;
@@ -66,7 +72,7 @@ namespace ChatApp.Services
         private Agent? GetAvailableAgent()
         {
             Team currentTeam = GetTeamOnShift();
-            return currentTeam.Agents.FirstOrDefault(a => a.IsAvailable == true);
+            return currentTeam.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
         }
 
         private void AssignWaitingChats()
