@@ -2,6 +2,7 @@
 using ChatApp.Interfaces;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,16 @@ namespace ChatApp.Tests
 
         public QueueServiceTests()
         {
-            _queueService = new QueueService();
+            var settings = new ChatSettings
+            {
+                TimerIntervalSeconds = 10,
+                PollsPerSecond = 1,
+                MarkInactiveAfterNumberOfMissedPolls = 3
+            };
+
+            var mockSettings = new Mock<IOptions<ChatSettings>>();
+            mockSettings.Setup(ap => ap.Value).Returns(settings);
+            _queueService = new QueueService(mockSettings.Object);
         }
 
         [Fact]
@@ -136,9 +146,7 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_BothQueuesEmpty_ReturnsNull()
         {
-            var queueService = new QueueService();
-
-            var result = queueService.Dequeue();
+            var result = _queueService.Dequeue();
 
             Assert.Null(result);
         }
@@ -146,11 +154,10 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_MainQueueHasItems_ReturnsItemFromMainQueue()
         {
-            var queueService = new QueueService();
             var chatSession = new ChatSession();
-            queueService.TryEnqueue(chatSession);
+            _queueService.TryEnqueue(chatSession);
 
-            var result = queueService.Dequeue();
+            var result = _queueService.Dequeue();
 
             Assert.Equal(chatSession, result);
         }
