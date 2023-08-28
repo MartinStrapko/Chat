@@ -15,19 +15,6 @@ namespace ChatApp.Controllers
             _agentService = agentService;
         }
 
-        [HttpPost("register")]
-        public IActionResult RegisterAgent([FromBody] Agent agent)
-        {
-            if (agent == null || string.IsNullOrEmpty(agent.Name))
-            {
-                return BadRequest("Invalid agent details.");
-            }
-
-            _agentService.AddAgent(agent);
-
-            return Ok();
-        }
-
         //[HttpGet("chats/{agentId}")]
         //public IActionResult GetChatsAssigned(Guid agentId)
         //{
