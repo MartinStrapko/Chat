@@ -2,6 +2,7 @@ using ChatApp;
 using ChatApp.Interfaces;
 using ChatApp.Models;
 using ChatApp.Services;
+using System.Reflection;
 using System.Xml.Linq;
 
 
@@ -43,6 +44,7 @@ var shifts = new List<Shift> { morningShift, afternoonShift, nightShift, allDay 
 builder.Services.AddSingleton(teams);
 builder.Services.AddSingleton(shifts);
 builder.Services.AddHostedService<CheckMissedPollsService>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.Configure<ChatSettings>(builder.Configuration.GetSection("ChatSettings"));
 
 var app = builder.Build();

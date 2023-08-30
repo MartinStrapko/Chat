@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ChatApp.Models;
-using ChatApp.Interfaces;
+using MediatR;
+using ChatApp.Commands;
 
 namespace ChatApp.Controllers
 {
@@ -8,35 +8,38 @@ namespace ChatApp.Controllers
     [Route("api/[controller]")]
     public class ChatController : ControllerBase
     {
-        private readonly IQueueService _queueService;
+        private readonly IMediator _mediator;
 
-        public ChatController(IQueueService queueService)
+        public ChatController(IMediator mediator)
         {
-            _queueService = queueService;
+            _mediator = mediator;
         }
 
         [HttpPost("create-session")]
-        public IActionResult InitiateChat()
+        public async Task<IActionResult>  InitiateChat()
         {
-            var session = new ChatSession
-            {
-                SessionId = Guid.NewGuid(),
-            };
+            var command = new InitiateChatCommand();
+            bool isSuccess = await _mediator.Send(command);
 
-            if (_queueService.TryEnqueue(session))
+            if (isSuccess)
             {
-               return Ok(session.SessionId);
+                return Ok(command.SessionId);
             }
+
             return BadRequest("Queue is full.");
         }
 
         [HttpPost("poll-session/{sessionId}")]
-        public IActionResult PollSession(Guid sessionId)
+        public async Task<IActionResult> PollSession(Guid sessionId)
         {
-            if (_queueService.PollSession(sessionId))
+            var command = new PollChatSessionCommand(sessionId);
+            bool isPolled = await _mediator.Send(command);
+
+            if (isPolled)
             {
                 return Ok();
             }
+
             return NotFound("Session not found or already inactive.");
         }
     }
