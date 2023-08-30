@@ -16,7 +16,7 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("create-session")]
-        public async Task<IActionResult>  InitiateChat()
+        public async Task<IActionResult> InitiateChat()
         {
             var command = new InitiateChatCommand();
             bool isSuccess = await _mediator.Send(command);

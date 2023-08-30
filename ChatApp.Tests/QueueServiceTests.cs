@@ -1,6 +1,8 @@
-﻿using ChatApp.Controllers;
+﻿using ChatApp.Commands;
+using ChatApp.Controllers;
 using ChatApp.Interfaces;
 using ChatApp.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -42,18 +44,21 @@ namespace ChatApp.Tests
         }
 
         [Fact]
-        public void InitiateChat_WhenQueueIsFull_ShouldReturnBadRequest()
+        public async Task InitiateChat_WhenQueueIsFull_ShouldReturnBadRequest()
         {
-            var mockQueueService = new Mock<IQueueService>();
-            mockQueueService.Setup(s => s.TryEnqueue(It.IsAny<ChatSession>())).Returns(false);
+            var mockMediator = new Mock<IMediator>();
 
-            var controller = new ChatController(mockQueueService.Object);
+            mockMediator.Setup(m => m.Send(It.IsAny<InitiateChatCommand>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(false);
 
-            var result = controller.InitiateChat() as BadRequestObjectResult;
+            var controller = new ChatController(mockMediator.Object);
+
+            var result = await controller.InitiateChat() as BadRequestObjectResult;
 
             Assert.NotNull(result);
             Assert.Equal("Queue is full.", result.Value);
         }
+
 
         [Fact]
         public void TryEnqueue_ShouldReturnTrue_WhenQueueHasSpace()
