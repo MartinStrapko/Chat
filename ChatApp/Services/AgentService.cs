@@ -28,16 +28,20 @@ namespace ChatApp.Services
 
         public Agent? AssignChatToAgent(ChatSession sessionToAssign)
         {
-            Agent? availableAgent = GetAvailableAgent();
+            Agent? agent =
+            GetTeamOnShift()?.Agents
+                            .Where(a => a.CanHandleMoreChats)
+                            .GroupBy(a => a.Seniority)
+                            .OrderBy(g => g.Key)
+                            .SelectMany(g => g.OrderBy(a => a.CurrentChatSessions.Count))
+                            .FirstOrDefault();
 
-            if (availableAgent == null)
+            if (agent != null)
             {
-                return null;
+                agent.AssignChatSession(sessionToAssign);
+                return agent;
             }
-
-            availableAgent.AssignChatSession(sessionToAssign);
-
-            return availableAgent;
+            return null;
         }
 
         public bool EndChat(Guid sessionId)
