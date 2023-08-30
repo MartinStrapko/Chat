@@ -6,9 +6,8 @@ namespace ChatApp.Services
     public class AgentService : IAgentService
     {
         private readonly List<Team> _teams;
-        private readonly List<Shift> _shifts;
 
-        public event Action OnChatEnded;
+        public event Action? OnChatEnded;
 
         public AgentService(List<Team> teams)
         {
@@ -67,8 +66,7 @@ namespace ChatApp.Services
 
         public Agent? GetAvailableAgent()
         {
-            Team currentTeam = GetTeamOnShift();
-            return currentTeam?.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
+            return GetTeamOnShift()?.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
         }
     }
 }

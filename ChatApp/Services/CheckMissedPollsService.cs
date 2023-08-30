@@ -1,6 +1,5 @@
 ﻿using ChatApp.Interfaces;
 using Microsoft.Extensions.Options;
-using System.Runtime;
 
 namespace ChatApp.Services
 {

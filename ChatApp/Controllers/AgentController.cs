@@ -1,5 +1,4 @@
 ﻿using ChatApp.Interfaces;
-using ChatApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Controllers
@@ -17,7 +16,7 @@ namespace ChatApp.Controllers
 
 
         [HttpPost("end-session/{sessionId}")]
-        public IActionResult GetChatsAssigned(Guid sessionId)
+        public IActionResult EndChat(Guid sessionId)
         {
             var chats = _agentService.EndChat(sessionId);
 
@@ -27,29 +26,5 @@ namespace ChatApp.Controllers
             }
             return BadRequest("Chat does not exist.");
         }
-
-        //[HttpGet("chats/{agentId}")]
-        //public IActionResult GetChatsAssigned(Guid agentId)
-        //{
-        //    var chats = _agentService.GetAssignedChats(agentId);
-
-        //    if (chats == null)
-        //    {
-        //        return NotFound("Agent not found.");
-        //    }
-
-        //    return Ok(chats);
-        //}
-
-        //[HttpPost("update-status/{agentId}")]
-        //public IActionResult UpdateStatus(Guid agentId, [FromBody] AgentStatus status)
-        //{
-        //    if (!_agentService.UpdateStatus(agentId, status))
-        //    {
-        //        return NotFound("Agent not found or status not updated.");
-        //    }
-
-        //    return Ok("Status updated successfully.");
-        //}
     }
 }

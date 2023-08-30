@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ChatApp.Models;
 using ChatApp.Interfaces;
-using ChatApp.Services;
 
 namespace ChatApp.Controllers
 {
@@ -10,12 +9,10 @@ namespace ChatApp.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IQueueService _queueService;
-        private readonly IAgentService _agentService;
 
-        public ChatController(IQueueService queueService, IAgentService agentService)
+        public ChatController(IQueueService queueService)
         {
             _queueService = queueService;
-            _agentService = agentService;
         }
 
         [HttpPost("create-session")]

@@ -1,9 +1,6 @@
 ﻿using ChatApp;
 using ChatApp.Interfaces;
 using ChatApp.Models;
-using ChatApp.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 
 public class QueueService : IQueueService
