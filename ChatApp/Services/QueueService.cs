@@ -26,6 +26,8 @@ public class QueueService : IQueueService
         _agentService = agentService;
         _expectedPollsInIntervalSeconds = _chatSettings.TimerIntervalSeconds / _chatSettings.PollsPerSecond;
         _markInactiveAfterNumberOfMissedPolls = _chatSettings.MarkInactiveAfterNumberOfMissedPolls;
+
+        agentService.OnChatEnded += AssignWaitingChats;
     }
 
     public bool IsQueueFull()
