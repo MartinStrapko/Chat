@@ -8,6 +8,8 @@ namespace ChatApp.Services
         private readonly List<Team> _teams;
         private readonly List<Shift> _shifts;
 
+        public event Action OnChatEnded;
+
         public AgentService( List<Team> teams)
         {
             _teams = teams;
@@ -50,6 +52,7 @@ namespace ChatApp.Services
                 if (sessionToBeEnded != null)
                 {
                     agentHandlingSession.RemoveChatSession(sessionToBeEnded);
+                    OnChatEnded?.Invoke();
                     return true;
                 }
             }
