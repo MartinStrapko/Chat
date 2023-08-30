@@ -15,12 +15,10 @@ namespace ChatApp.Services
             _teams = teams;
         }
 
-        public Team GetTeamOnShift()
+        public Team? GetTeamOnShift()
         {
             var currentTime = DateTime.UtcNow.TimeOfDay;
-
-            Team currentTeam = _teams.FirstOrDefault(team => currentTime >= team.Shift.Start && currentTime <= team.Shift.End);
-            return currentTeam;
+            return _teams.FirstOrDefault(team => currentTime >= team.Shift.Start && currentTime <= team.Shift.End);
         }
 
         public Agent? AssignChatToAgent(ChatSession sessionToAssign)
@@ -61,7 +59,7 @@ namespace ChatApp.Services
         public Agent? GetAvailableAgent()
         {
             Team currentTeam = GetTeamOnShift();
-            return currentTeam.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
+            return currentTeam?.Agents.FirstOrDefault(a => a.CanHandleMoreChats);
         }
     }
 }

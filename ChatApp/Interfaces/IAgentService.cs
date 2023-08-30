@@ -8,6 +8,6 @@ namespace ChatApp.Interfaces
         Agent? AssignChatToAgent(ChatSession chatSession);
         Agent? GetAvailableAgent();
         bool EndChat(Guid sessionId);
-        public Team GetTeamOnShift();
+        public Team? GetTeamOnShift();
     }
 }
