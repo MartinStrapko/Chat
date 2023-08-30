@@ -15,6 +15,19 @@ namespace ChatApp.Controllers
             _agentService = agentService;
         }
 
+
+        [HttpPost("end-session/{sessionId}")]
+        public IActionResult GetChatsAssigned(Guid sessionId)
+        {
+            var chats = _agentService.EndChat(sessionId);
+
+            if(chats)
+            {
+                return Ok();
+            }
+            return BadRequest("Chat does not exist.");
+        }
+
         //[HttpGet("chats/{agentId}")]
         //public IActionResult GetChatsAssigned(Guid agentId)
         //{
