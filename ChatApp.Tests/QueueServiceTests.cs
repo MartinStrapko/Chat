@@ -15,6 +15,7 @@ namespace ChatApp.Tests
     public class QueueServiceTests
     {
         private readonly QueueService _queueService;
+        private readonly Mock<QueueService> _mockQueueService;
 
         public QueueServiceTests()
         {
@@ -28,13 +29,16 @@ namespace ChatApp.Tests
             var mockSettings = new Mock<IOptions<ChatSettings>>();
             mockSettings.Setup(ap => ap.Value).Returns(settings);
             var mockAgentService = new Mock<IAgentService>();
-            _queueService = new QueueService(mockSettings.Object, mockAgentService.Object);
+            _mockQueueService = new Mock<QueueService>(mockSettings.Object, mockAgentService.Object);
+            _queueService = _mockQueueService.Object;
+
         }
 
         [Fact]
         public void TryEnqueue_ShouldAddChatSessionToQueue()
         {
             var chatSession = new ChatSession { SessionId = Guid.NewGuid() };
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(1);
 
             bool isEnqueued = _queueService.TryEnqueue(chatSession);
 
@@ -60,7 +64,7 @@ namespace ChatApp.Tests
         [Fact]
         public void TryEnqueue_ShouldReturnTrue_WhenQueueHasSpace()
         {
-            _queueService.MaxCapacity = 2;
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(2);
 
             var chatSession = new ChatSession();
             var result = _queueService.TryEnqueue(chatSession);
@@ -71,8 +75,7 @@ namespace ChatApp.Tests
         [Fact]
         public void TryEnqueue_ShouldReturnFalse_WhenQueueIsFull()
         {
-            _queueService.MaxCapacity = 1;
-            _queueService.OverflowCapacity = 0;
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(0);
             _queueService.TryEnqueue(new ChatSession());
 
             var anotherChatSession = new ChatSession();
@@ -84,8 +87,8 @@ namespace ChatApp.Tests
         [Fact]
         public void TryEnqueue_ShouldAddToOverflow_WhenMainQueueIsFullAndItsOfficeHours()
         {
-            _queueService.MaxCapacity = 1;
-            _queueService.OverflowCapacity = 1;
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(1);
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(1);
             var currentTime = DateTime.UtcNow;
             _queueService.OfficeStart = currentTime.TimeOfDay - TimeSpan.FromHours(1);  // Office started 1 hour ago
             _queueService.OfficeEnd = currentTime.TimeOfDay + TimeSpan.FromHours(1);    // Office ends in 1 hour
@@ -102,8 +105,7 @@ namespace ChatApp.Tests
         [Fact]
         public void TryEnqueue_ShouldNotAddToOverflow_WhenOutsideOfficeHours()
         {
-            _queueService.MaxCapacity = 1;
-            _queueService.OverflowCapacity = 1;
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(1);
             var currentTime = DateTime.UtcNow;
             _queueService.OfficeStart = currentTime.TimeOfDay + TimeSpan.FromMinutes(10);  // Office starts in 10 minutes
             _queueService.OfficeEnd = currentTime.TimeOfDay + TimeSpan.FromHours(8);      // Office ends in 8 hours
@@ -119,8 +121,7 @@ namespace ChatApp.Tests
         [Fact]
         public void TryEnqueue_ShouldRefuseChat_WhenBothQueuesAreFull()
         {
-            _queueService.MaxCapacity = 1;
-            _queueService.OverflowCapacity = 1;
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(1);
             _queueService.TryEnqueue(new ChatSession());
             _queueService.TryEnqueue(new ChatSession());
 
@@ -133,6 +134,7 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_ShouldRemoveAndReturnChatSessionFromFront()
         {
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(1);
             var chatSession1 = new ChatSession();
             var chatSession2 = new ChatSession();
 
@@ -156,6 +158,7 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_MainQueueHasItems_ReturnsItemFromMainQueue()
         {
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(1);
             var chatSession = new ChatSession();
             _queueService.TryEnqueue(chatSession);
 
@@ -167,8 +170,7 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_MainAndOverflowBothHaveItems_ReturnsItemFromMainQueueFirst()
         {
-            _queueService.MaxCapacity = 5;
-            _queueService.OverflowCapacity = 1;
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(1);
             var currentTime = DateTime.UtcNow;
             _queueService.OfficeStart = currentTime.TimeOfDay - TimeSpan.FromHours(1);
             _queueService.OfficeEnd = currentTime.TimeOfDay + TimeSpan.FromHours(1);
@@ -190,8 +192,8 @@ namespace ChatApp.Tests
         [Fact]
         public void Dequeue_MainQueueEmptyOverflowHasItems_ReturnsItemFromOverflow()
         {
-            _queueService.MaxCapacity = 10;
-            _queueService.OverflowCapacity = 1;
+            _mockQueueService.Setup(q => q.MaxCapacity).Returns(10);
+            _mockQueueService.Setup(q => q.OverflowCapacity).Returns(1);
             var currentTime = DateTime.UtcNow;
             _queueService.OfficeStart = currentTime.TimeOfDay - TimeSpan.FromHours(1);
             _queueService.OfficeEnd = currentTime.TimeOfDay + TimeSpan.FromHours(1);
