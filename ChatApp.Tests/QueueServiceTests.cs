@@ -27,7 +27,8 @@ namespace ChatApp.Tests
 
             var mockSettings = new Mock<IOptions<ChatSettings>>();
             mockSettings.Setup(ap => ap.Value).Returns(settings);
-            _queueService = new QueueService(mockSettings.Object);
+            var mockAgentService = new Mock<IAgentService>();
+            _queueService = new QueueService(mockSettings.Object, mockAgentService.Object);
         }
 
         [Fact]
@@ -71,6 +72,7 @@ namespace ChatApp.Tests
         public void TryEnqueue_ShouldReturnFalse_WhenQueueIsFull()
         {
             _queueService.MaxCapacity = 1;
+            _queueService.OverflowCapacity = 0;
             _queueService.TryEnqueue(new ChatSession());
 
             var anotherChatSession = new ChatSession();
