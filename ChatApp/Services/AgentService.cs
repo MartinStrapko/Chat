@@ -32,8 +32,6 @@ namespace ChatApp.Services
                 return null;
             }
 
-            availableAgent.CurrentChatsCount++;
-
             availableAgent.AssignChatSession(sessionToAssign);
 
             return availableAgent;

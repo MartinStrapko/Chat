@@ -8,8 +8,7 @@ namespace ChatApp.Models
         public string Name { get; set; }
         public AgentSeniority Seniority { get; set; }
         public bool IsAvailable { get; set; } = true;
-        public int CurrentChatsCount { get; set; } = 0;
-        public bool CanHandleMoreChats => CurrentChatsCount < Capacity;
+        public bool CanHandleMoreChats => CurrentChatSessions.Count < Capacity;
 
         public const int BaseConcurrency = 10;
 
