@@ -28,16 +28,7 @@ namespace ChatApp.Controllers
 
             if (_queueService.TryEnqueue(session))
             {
-                ChatSession? sessionToAssign = _queueService.Dequeue();
-                var assignedAgent = _agentService.AssignChatToAgent(sessionToAssign);
-                if (assignedAgent != null)
-                {
-                    return Ok(new { SessionId = session.SessionId, AgentId = assignedAgent.Id });
-                }
-                else
-                {
-                    return Accepted(session.SessionId);
-                }
+               return Ok(session.SessionId);
             }
             return BadRequest("Queue is full.");
         }
