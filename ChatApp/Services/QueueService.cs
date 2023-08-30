@@ -36,16 +36,27 @@ public class QueueService : IQueueService
         return _queue.Count >= maxQueueLength;
     }
 
-    private void AssignAgent()
+    private Agent? AssignAgent(ChatSession session)
     {
-        ChatSession? sessionToAssign = _queue.Dequeue();
-        _agentService.AssignChatToAgent(sessionToAssign);
+        if(_agentService.GetAvailableAgent()!=null)
+        {
+            return _agentService.AssignChatToAgent(session);
+        }
+        return null;
     }
 
     public bool TryEnqueue(ChatSession session)
     {
         if (session == null)
             return false;
+
+        var assignedAgent = AssignAgent(session);
+
+        if (assignedAgent != null)
+        {
+            return true;
+        }
+
         if (_queue.Count < MaxCapacity)
         {
             _queue.Enqueue(session);
@@ -59,7 +70,6 @@ public class QueueService : IQueueService
             return false;
         }
 
-        AssignAgent();
         return true;
     }
 
