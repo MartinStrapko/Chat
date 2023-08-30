@@ -10,7 +10,7 @@ namespace ChatApp.Services
 
         public event Action OnChatEnded;
 
-        public AgentService( List<Team> teams)
+        public AgentService(List<Team> teams)
         {
             _teams = teams;
         }
@@ -19,6 +19,11 @@ namespace ChatApp.Services
         {
             var currentTime = DateTime.UtcNow.TimeOfDay;
             return _teams.FirstOrDefault(team => currentTime >= team.Shift.Start && currentTime <= team.Shift.End);
+        }
+
+        public Team? GetOverflowTeam()
+        {
+            return _teams.Last();
         }
 
         public Agent? AssignChatToAgent(ChatSession sessionToAssign)

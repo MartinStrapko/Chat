@@ -9,5 +9,6 @@ namespace ChatApp.Interfaces
         Agent? GetAvailableAgent();
         bool EndChat(Guid sessionId);
         public Team? GetTeamOnShift();
+        public Team? GetOverflowTeam();
     }
 }

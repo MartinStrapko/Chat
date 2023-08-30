@@ -15,8 +15,8 @@ public class QueueService : IQueueService
     private readonly int _markInactiveAfterNumberOfMissedPolls;
     private readonly IAgentService _agentService;
 
-    public int MaxCapacity { get; set; } = 10;
-    public int OverflowCapacity { get; set; } = 10;
+    public virtual int MaxCapacity => (int)_agentService.GetTeamOnShift().MaxQueueLength;
+    public virtual int OverflowCapacity => (int)_agentService.GetOverflowTeam().MaxQueueLength;
     public TimeSpan OfficeStart { get; set; } = new TimeSpan(9, 0, 0);
     public TimeSpan OfficeEnd { get; set; } = new TimeSpan(17, 0, 0);
 
